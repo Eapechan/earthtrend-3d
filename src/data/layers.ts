@@ -1,0 +1,303 @@
+import type { LayerDefinition } from '../types'
+
+/**
+ * Layer registry.
+ *
+ * Every GIBS identifier, tile-matrix-set and level below was verified against
+ * the live WMTS capabilities document. Levels matter: requesting a layer with
+ * the wrong matrix set returns HTTP 400 (e.g. NDVI is Level 7, not Level 6).
+ */
+export const LAYERS: LayerDefinition[] = [
+  {
+    id: 'temperature',
+    label: 'Temperature',
+    tagline: 'Air & surface heat',
+    blurb:
+      'Two different physical quantities, kept separate: atmospheric air temperature from AIRS and radiometric land-surface (skin) temperature from MODIS.',
+    accent: '#fb923c',
+    defaultVariantId: 'airs-air',
+    variants: [
+      {
+        id: 'airs-air',
+        label: 'Surface air temperature',
+        shortLabel: 'Air temp',
+        provenanceId: 'airs-air-temp',
+        gibsLayer: 'AIRS_L3_Surface_Air_Temperature_Daily_Day',
+        tileMatrixSet: 'GoogleMapsCompatible_Level6',
+        maxLevel: 6,
+        cadence: 'daily',
+        startDate: '2002-09-01',
+        lagDays: 6,
+        units: '°C',
+        quantityLabel: 'Surface air temperature',
+        nativeResolution: '1° × 1° (~110 km)',
+        nativeResolutionKm: 110,
+        display: 'temperature',
+        kelvinToCelsius: true,
+        legendKey: 'airTemp',
+        description:
+          'Daily daytime surface air temperature retrieved by the AIRS infrared sounder on NASA’s Aqua satellite.',
+        caveat:
+          'This is air temperature, not ground temperature, and it is a 1° regional average — not a district-level reading.',
+        powerVariable: 'T2M',
+        supportsPointTrend: true,
+        supportsPixelSample: false,
+        legendUrl: 'https://gibs.earthdata.nasa.gov/legends/AIRS_Surface_Air_Temperature_Daily_Day_H.svg',
+      },
+      {
+        id: 'modis-lst',
+        label: 'Land surface temperature',
+        shortLabel: 'Skin temp',
+        provenanceId: 'modis-lst',
+        gibsLayer: 'MODIS_Terra_Land_Surface_Temp_Day',
+        tileMatrixSet: 'GoogleMapsCompatible_Level7',
+        maxLevel: 7,
+        cadence: 'daily',
+        startDate: '2000-02-24',
+        lagDays: 2,
+        units: '°C',
+        quantityLabel: 'Land surface (skin) temperature',
+        nativeResolution: '1 km',
+        nativeResolutionKm: 1,
+        display: 'temperature',
+        kelvinToCelsius: true,
+        legendKey: 'lst',
+        description:
+          'Daytime radiometric land-surface temperature from MODIS/Terra — the temperature of the ground, vegetation canopy or rooftops.',
+        caveat:
+          'Land surface temperature is not air temperature. A hot city block or bare soil can be far warmer than the air above it.',
+        supportsPointTrend: false,
+        supportsPixelSample: false,
+        legendUrl: 'https://gibs.earthdata.nasa.gov/legends/MODIS_Land_Surface_Temp_H.svg',
+      },
+    ],
+  },
+  {
+    id: 'wind',
+    label: 'Wind',
+    tagline: 'Speed & flow',
+    blurb:
+      'MERRA-2 monthly mean surface wind speed from NASA, with real 10 m wind vectors and a particle flow field for the selected period.',
+    accent: '#22d3ee',
+    defaultVariantId: 'merra2-speed',
+    variants: [
+      {
+        id: 'merra2-speed',
+        label: 'Surface wind speed (monthly)',
+        shortLabel: 'Wind speed',
+        provenanceId: 'merra2-wind',
+        gibsLayer: 'MERRA2_Surface_Wind_Speed_Monthly',
+        tileMatrixSet: 'GoogleMapsCompatible_Level6',
+        maxLevel: 6,
+        cadence: 'monthly',
+        startDate: '1980-01-01',
+        lagDays: 100,
+        units: 'm/s',
+        quantityLabel: 'Mean surface wind speed',
+        nativeResolution: '0.5° × 0.625° (~50 × 70 km)',
+        nativeResolutionKm: 60,
+        display: 'rate',
+        legendKey: 'wind',
+        description:
+          'Monthly mean 10 m wind speed from the MERRA-2 reanalysis. The flow overlay separately shows real 10 m vectors at 12:00 UTC on the selected date — a single-hour sample, not a monthly mean.',
+        caveat:
+          'Monthly averaging removes storms and gusts. The raster contains no direction; the flow overlay comes from a separate 10 m sample at 12:00 UTC on the selected date.',
+        powerVariable: 'WS2M',
+        supportsPointTrend: true,
+        supportsPixelSample: false,
+        legendUrl: 'https://gibs.earthdata.nasa.gov/legends/MERRA2_Surface_Wind_Speed_Monthly_H.svg',
+      },
+    ],
+  },
+  {
+    id: 'rainfall',
+    label: 'Rainfall',
+    tagline: 'Precipitation',
+    blurb:
+      'GPM IMERG satellite precipitation estimates, with logarithmic intensity colours and monthly reanalysis precipitation for longer records.',
+    accent: '#38bdf8',
+    defaultVariantId: 'imerg-daily',
+    variants: [
+      {
+        id: 'imerg-daily',
+        label: 'Precipitation rate (daily)',
+        shortLabel: 'IMERG',
+        provenanceId: 'imerg',
+        gibsLayer: 'IMERG_Precipitation_Rate',
+        tileMatrixSet: 'GoogleMapsCompatible_Level6',
+        maxLevel: 6,
+        cadence: 'daily',
+        startDate: '2000-06-01',
+        lagDays: 2,
+        units: 'mm/h',
+        quantityLabel: 'Precipitation rate',
+        nativeResolution: '0.1° × 0.1° (~11 km)',
+        nativeResolutionKm: 11,
+        display: 'rate',
+        legendKey: 'rain',
+        description:
+          'Daily precipitation-rate composite from the Global Precipitation Measurement mission, combining microwave and infrared observations.',
+        caveat:
+          'Satellite estimate, not a gauge. Convective extremes and orographic rain can be displaced or underestimated.',
+        powerVariable: 'PRECTOTCORR',
+        supportsPointTrend: true,
+        supportsPixelSample: false,
+        legendUrl: 'https://gibs.earthdata.nasa.gov/legends/GPM_Precipitation_Rate_H.svg',
+      },
+      {
+        id: 'merra2-rain',
+        label: 'Precipitation (monthly)',
+        shortLabel: 'Monthly',
+        provenanceId: 'merra2-wind',
+        gibsLayer: 'MERRA2_Precipitation_Bias_Corrected_Monthly',
+        tileMatrixSet: 'GoogleMapsCompatible_Level6',
+        maxLevel: 6,
+        cadence: 'monthly',
+        startDate: '1980-01-01',
+        lagDays: 100,
+        units: 'mm/day',
+        quantityLabel: 'Monthly mean precipitation rate',
+        nativeResolution: '0.5° × 0.625° (~50 × 70 km)',
+        nativeResolutionKm: 60,
+        display: 'rate',
+        legendKey: 'rain',
+        description:
+          'Bias-corrected MERRA-2 monthly precipitation. A longer, smoother record than IMERG, useful for multi-decade comparisons.',
+        caveat:
+          'A model reanalysis at ~50 km; it cannot resolve a single storm or a local rain shadow.',
+        powerVariable: 'PRECTOTCORR',
+        supportsPointTrend: true,
+        supportsPixelSample: false,
+      },
+    ],
+  },
+  {
+    id: 'vegetation',
+    label: 'Vegetation',
+    tagline: 'NDVI health',
+    blurb:
+      'MODIS monthly NDVI composites: brown to green shows vegetation vigour, with the caveat that dense tropical canopy saturates the index.',
+    accent: '#4ade80',
+    defaultVariantId: 'ndvi-monthly',
+    variants: [
+      {
+        id: 'ndvi-monthly',
+        label: 'NDVI (monthly)',
+        shortLabel: 'NDVI',
+        provenanceId: 'modis-ndvi',
+        gibsLayer: 'MODIS_Terra_L3_NDVI_Monthly',
+        tileMatrixSet: 'GoogleMapsCompatible_Level7',
+        maxLevel: 7,
+        cadence: 'monthly',
+        startDate: '2000-03-01',
+        lagDays: 20,
+        units: 'NDVI',
+        quantityLabel: 'Normalised Difference Vegetation Index',
+        nativeResolution: '1 km',
+        nativeResolutionKm: 1,
+        display: 'index',
+        legendKey: 'ndvi',
+        description:
+          'Monthly MODIS/Terra NDVI composite. Higher values indicate denser, greener vegetation canopies.',
+        caveat:
+          'NDVI saturates in dense tropical forest; a fully green canopy can hide degradation. NASA POWER does not publish NDVI, so no point time series is shown for this layer.',
+        supportsPointTrend: false,
+        supportsPixelSample: false,
+        legendUrl: 'https://gibs.earthdata.nasa.gov/legends/MODIS_L3_NDVI_H.svg',
+      },
+    ],
+  },
+  {
+    id: 'atmosphere',
+    label: 'Atmosphere',
+    tagline: 'Humidity & aerosols',
+    blurb:
+      'Separate atmospheric variables — near-surface relative humidity, column aerosol optical depth, and a discontinued mid-tropospheric CO₂ record.',
+    accent: '#a78bfa',
+    defaultVariantId: 'airs-rh',
+    variants: [
+      {
+        id: 'airs-rh',
+        label: 'Surface relative humidity',
+        shortLabel: 'Humidity',
+        provenanceId: 'airs-rh',
+        gibsLayer: 'AIRS_L3_Surface_Relative_Humidity_Daily_Day',
+        tileMatrixSet: 'GoogleMapsCompatible_Level6',
+        maxLevel: 6,
+        cadence: 'daily',
+        startDate: '2002-09-01',
+        lagDays: 6,
+        units: '%',
+        quantityLabel: 'Surface relative humidity',
+        nativeResolution: '1° × 1° (~110 km)',
+        nativeResolutionKm: 110,
+        display: 'percent',
+        legendKey: 'rh',
+        description: 'Daily daytime near-surface relative humidity retrieved by AIRS/Aqua.',
+        caveat: 'No retrieval under thick cloud. A 1° cell is a regional average.',
+        powerVariable: 'RH2M',
+        supportsPointTrend: true,
+        supportsPixelSample: false,
+        legendUrl: 'https://gibs.earthdata.nasa.gov/legends/AIRS_Surface_Relative_Humidity_Daily_Day_H.svg',
+      },
+      {
+        id: 'modis-aod',
+        label: 'Aerosol optical depth',
+        shortLabel: 'Aerosols',
+        provenanceId: 'modis-aod',
+        gibsLayer: 'MODIS_Terra_Aerosol',
+        tileMatrixSet: 'GoogleMapsCompatible_Level6',
+        maxLevel: 6,
+        cadence: 'daily',
+        startDate: '2000-02-24',
+        lagDays: 2,
+        units: 'AOD',
+        quantityLabel: 'Aerosol optical depth (550 nm)',
+        nativeResolution: '10 km',
+        nativeResolutionKm: 10,
+        display: 'index',
+        legendKey: 'aod',
+        description:
+          'Column aerosol optical depth: how much sunlight is scattered or absorbed by particles in the whole atmospheric column.',
+        caveat:
+          'AOD is not surface PM₂.₅. Smoke, dust and haze all contribute, and bright surfaces reduce retrieval quality.',
+        supportsPointTrend: false,
+        supportsPixelSample: false,
+        legendUrl: 'https://gibs.earthdata.nasa.gov/legends/MODIS_VIIRS_AOD_H.svg',
+      },
+      {
+        id: 'airs-co2',
+        label: 'Mid-tropospheric CO₂ (2002–2012)',
+        shortLabel: 'CO₂',
+        provenanceId: 'airs-co2',
+        gibsLayer: 'AIRS_L3_Carbon_Dioxide_AIRS_AMSU_Monthly',
+        tileMatrixSet: 'GoogleMapsCompatible_Level6',
+        maxLevel: 6,
+        cadence: 'monthly',
+        startDate: '2002-09-01',
+        endDate: '2012-02-01',
+        lagDays: 0,
+        units: 'ppm',
+        quantityLabel: 'Mid-tropospheric CO₂ mixing ratio',
+        nativeResolution: '~2° × 2.5°',
+        nativeResolutionKm: 250,
+        display: 'concentration',
+        legendKey: 'co2',
+        description:
+          'AIRS/AMSU monthly mid-tropospheric carbon dioxide. Included as a historical record, not a current CO₂ monitor.',
+        caveat:
+          'The GIBS archive for this product ends in February 2012. These are mid-tropospheric concentrations and cannot be used to estimate local surface emissions.',
+        supportsPointTrend: false,
+        supportsPixelSample: false,
+      },
+    ],
+  },
+]
+
+export function getLayer(id: string): LayerDefinition {
+  return LAYERS.find((l) => l.id === id) ?? LAYERS[0]
+}
+
+export function getVariant(layer: LayerDefinition, variantId: string) {
+  return layer.variants.find((v) => v.id === variantId) ?? layer.variants[0]
+}

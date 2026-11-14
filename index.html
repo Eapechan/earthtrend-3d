@@ -1,0 +1,88 @@
+<!doctype html>
+<html lang="en" class="dark">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+    <meta name="theme-color" content="#04060b" />
+    <meta
+      name="description"
+      content="EarthTrend 3D — explore NASA Earth observation imagery on an interactive 3D globe and detect environmental trends with Mann–Kendall and Sen's slope."
+    />
+    <meta property="og:title" content="EarthTrend 3D" />
+    <meta
+      property="og:description"
+      content="Interactive 3D Earth observation and environmental trend detection powered by public NASA data."
+    />
+    <meta property="og:type" content="website" />
+    <title>EarthTrend 3D — NASA Earth System Trend Detective</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Space+Grotesk:wght@500;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="preconnect" href="https://gibs.earthdata.nasa.gov" crossorigin />
+    <link rel="preconnect" href="https://power.larc.nasa.gov" crossorigin />
+    <style>
+      html,
+      body {
+        margin: 0;
+        background: #04060b;
+        color: #e6edf7;
+      }
+      #boot-splash {
+        position: fixed;
+        inset: 0;
+        z-index: 100;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        gap: 14px;
+        background: radial-gradient(circle at 50% 40%, #0b1c33 0%, #04060b 62%);
+        font-family: 'Space Grotesk', 'Segoe UI', system-ui, sans-serif;
+        transition: opacity 0.4s ease;
+      }
+      #boot-splash .boot-orbit {
+        width: 46px;
+        height: 46px;
+        border-radius: 50%;
+        border: 1px solid rgba(56, 189, 248, 0.25);
+        border-top-color: #38bdf8;
+        animation: boot-spin 1s linear infinite;
+      }
+      #boot-splash .boot-title {
+        font-size: 13px;
+        letter-spacing: 0.32em;
+        text-transform: uppercase;
+        color: #b6cce6;
+      }
+      #boot-splash .boot-sub {
+        font-size: 11px;
+        letter-spacing: 0.08em;
+        color: #5d7793;
+        font-family: 'Inter', system-ui, sans-serif;
+      }
+      @keyframes boot-spin {
+        to {
+          transform: rotate(360deg);
+        }
+      }
+      @media (prefers-reduced-motion: reduce) {
+        #boot-splash .boot-orbit {
+          animation: none;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div id="boot-splash">
+      <div class="boot-orbit"></div>
+      <div class="boot-title">EarthTrend 3D</div>
+      <div class="boot-sub">Initializing Earth observation systems…</div>
+    </div>
+    <div id="root"></div>
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
+</html>

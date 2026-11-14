@@ -1,0 +1,364 @@
+@import 'tailwindcss';
+
+@theme {
+  --font-sans: 'Inter', ui-sans-serif, system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --font-display: 'Space Grotesk', 'Inter', ui-sans-serif, system-ui, sans-serif;
+
+  --color-abyss: #04060b;
+  --color-deep: #070d18;
+  --color-panel: #0a1422;
+  --color-ink: #e6edf7;
+  --color-muted: #8ea3bd;
+  --color-faint: #5d7793;
+  --color-line: #1b2a3f;
+  --color-accent: #38bdf8;
+  --color-accent-soft: #7dd3fc;
+  --color-warm: #f59e0b;
+  --color-danger: #f87171;
+  --color-good: #34d399;
+}
+
+@layer base {
+  * {
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  html,
+  body,
+  #root {
+    height: 100%;
+  }
+
+  body {
+    margin: 0;
+    background: var(--color-abyss);
+    color: var(--color-ink);
+    font-family: var(--font-sans);
+    font-feature-settings: 'cv02', 'cv03', 'cv04', 'tnum';
+    overscroll-behavior: none;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  ::selection {
+    background: rgba(56, 189, 248, 0.28);
+  }
+
+  :focus-visible {
+    outline: 2px solid rgba(56, 189, 248, 0.85);
+    outline-offset: 2px;
+  }
+
+  ::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+  }
+  ::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  ::-webkit-scrollbar-thumb {
+    background: rgba(120, 150, 185, 0.22);
+    border-radius: 999px;
+  }
+  ::-webkit-scrollbar-thumb:hover {
+    background: rgba(120, 150, 185, 0.38);
+  }
+}
+
+@layer components {
+  .glass {
+    background:
+      linear-gradient(180deg, rgba(14, 26, 44, 0.86) 0%, rgba(7, 14, 25, 0.9) 100%);
+    border: 1px solid rgba(125, 165, 210, 0.14);
+    box-shadow:
+      0 24px 60px -28px rgba(0, 0, 0, 0.9),
+      inset 0 1px 0 rgba(255, 255, 255, 0.04);
+    backdrop-filter: blur(18px) saturate(135%);
+    -webkit-backdrop-filter: blur(18px) saturate(135%);
+  }
+
+  .glass-soft {
+    background: rgba(10, 20, 34, 0.62);
+    border: 1px solid rgba(125, 165, 210, 0.12);
+    backdrop-filter: blur(14px);
+    -webkit-backdrop-filter: blur(14px);
+  }
+
+  .hairline {
+    border-color: rgba(125, 165, 210, 0.12);
+  }
+
+  .label-caps {
+    font-family: var(--font-display);
+    font-size: 10px;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--color-faint);
+  }
+
+  .num {
+    font-variant-numeric: tabular-nums;
+  }
+
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    border-radius: 8px;
+    border: 1px solid rgba(125, 165, 210, 0.16);
+    background: rgba(13, 24, 40, 0.72);
+    color: var(--color-ink);
+    font-size: 12px;
+    font-weight: 500;
+    padding: 6px 10px;
+    transition:
+      background 140ms ease,
+      border-color 140ms ease,
+      color 140ms ease,
+      transform 140ms ease;
+  }
+  .btn:hover {
+    background: rgba(24, 42, 66, 0.9);
+    border-color: rgba(56, 189, 248, 0.4);
+  }
+  .btn:active {
+    transform: translateY(1px);
+  }
+  .btn:disabled {
+    opacity: 0.45;
+    pointer-events: none;
+  }
+
+  .btn-active {
+    background: rgba(56, 189, 248, 0.14);
+    border-color: rgba(56, 189, 248, 0.55);
+    color: #bae6fd;
+  }
+
+  .icon-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 30px;
+    height: 30px;
+    border-radius: 7px;
+    border: 1px solid transparent;
+    color: var(--color-muted);
+    transition:
+      background 140ms ease,
+      color 140ms ease;
+  }
+  .icon-btn:hover {
+    background: rgba(148, 187, 233, 0.1);
+    color: var(--color-ink);
+  }
+
+  .chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    border-radius: 999px;
+    border: 1px solid rgba(125, 165, 210, 0.18);
+    background: rgba(12, 23, 38, 0.7);
+    padding: 2px 7px;
+    font-size: 10px;
+    letter-spacing: 0.04em;
+    color: #9fb4cd;
+    white-space: nowrap;
+  }
+
+  .divider {
+    height: 1px;
+    background: linear-gradient(
+      90deg,
+      transparent,
+      rgba(125, 165, 210, 0.16) 12%,
+      rgba(125, 165, 210, 0.16) 88%,
+      transparent
+    );
+  }
+
+  .select {
+    width: 100%;
+    appearance: none;
+    border-radius: 7px;
+    border: 1px solid rgba(125, 165, 210, 0.18);
+    background: rgba(8, 17, 30, 0.9);
+    color: var(--color-ink);
+    font-size: 12px;
+    padding: 7px 26px 7px 9px;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='%238ea3bd'%3E%3Cpath d='M4.2 6.2 8 10l3.8-3.8' stroke='%238ea3bd' stroke-width='1.4' fill='none'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 8px center;
+    background-size: 12px;
+  }
+  .select:focus {
+    border-color: rgba(56, 189, 248, 0.6);
+    outline: none;
+  }
+
+  .scroll-thin {
+    scrollbar-width: thin;
+    scrollbar-color: rgba(120, 150, 185, 0.3) transparent;
+  }
+
+  .range {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 100%;
+    height: 3px;
+    border-radius: 999px;
+    background: rgba(125, 165, 210, 0.22);
+    outline: none;
+  }
+  .range::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    width: 13px;
+    height: 13px;
+    border-radius: 50%;
+    background: #e0f2fe;
+    border: 2px solid #0ea5e9;
+    box-shadow: 0 0 0 3px rgba(14, 165, 233, 0.18);
+    cursor: pointer;
+  }
+  .range::-moz-range-thumb {
+    width: 13px;
+    height: 13px;
+    border: 2px solid #0ea5e9;
+    border-radius: 50%;
+    background: #e0f2fe;
+    cursor: pointer;
+  }
+
+  .grid-noise {
+    background-image:
+      linear-gradient(rgba(125, 165, 210, 0.04) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(125, 165, 210, 0.04) 1px, transparent 1px);
+    background-size: 46px 46px;
+  }
+}
+
+/* ---- Cesium integration -------------------------------------------------- */
+.cesium-host .cesium-widget,
+.cesium-host .cesium-widget canvas {
+  outline: none;
+}
+
+.cesium-host .cesium-widget-credits {
+  font-family: var(--font-sans);
+}
+
+#cesium-credits {
+  position: absolute;
+  right: 10px;
+  bottom: 6px;
+  z-index: 30;
+  max-width: 58vw;
+  font-size: 9px;
+  line-height: 1.35;
+  color: rgba(255, 255, 255, 0.42);
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.8);
+}
+
+#cesium-credits a,
+#cesium-credits a:visited {
+  color: rgba(125, 211, 252, 0.72) !important;
+  text-decoration: none;
+}
+
+#cesium-credits .cesium-credit-expand-link {
+  color: rgba(125, 211, 252, 0.62) !important;
+}
+
+#cesium-credits img {
+  max-height: 18px;
+  vertical-align: middle;
+  opacity: 0.8;
+}
+
+.cesium-host .cesium-viewer-bottom {
+  display: none;
+}
+
+/* Cesium's default selection/loading widgets that can flash before imagery. */
+.cesium-host .cesium-widget-errorPanel {
+  z-index: 9999;
+}
+
+/* ---- Loading screen ------------------------------------------------------ */
+@keyframes orbit-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.loading-orbit {
+  animation: orbit-spin 2.6s linear infinite;
+}
+
+.loading-orbit-fast {
+  animation-duration: 1.15s;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .loading-orbit {
+    animation: none;
+  }
+}
+
+
+@keyframes pulse-dot {
+  0%,
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.4;
+    transform: scale(0.86);
+  }
+}
+
+@keyframes slide-up {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes fade-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.animate-slide-up {
+  animation: slide-up 260ms cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+.animate-fade-in {
+  animation: fade-in 220ms ease both;
+}
+.live-dot {
+  animation: pulse-dot 2.4s ease-in-out infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+    scroll-behavior: auto !important;
+  }
+  .live-dot {
+    animation: none;
+  }
+}

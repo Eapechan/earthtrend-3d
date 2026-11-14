@@ -1,0 +1,38 @@
+# Build output
+dist
+dist-ssr
+*.local
+
+# Dependencies
+node_modules
+
+# Cesium runtime copied from node_modules by scripts/copy-cesium.mjs
+public/cesium
+
+# Editor / OS
+.vscode/*
+!.vscode/extensions.json
+.idea
+.DS_Store
+Thumbs.db
+
+# Logs
+logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# Test / coverage
+coverage
+
+# Environment (no keys are required; these stay local)
+.env
+.env.*
+!.env.example
+
+# Playwright artefacts
+playwright-report
+test-results
+docs/screenshots/*.tmp.png
