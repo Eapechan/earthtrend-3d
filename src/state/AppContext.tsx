@@ -62,7 +62,7 @@ function initialState(): AppState {
     compareDate: clampVariantDate(initialVariant, addMonths(initialDate, -12)),
     playing: false,
     speed: 1,
-    opacity: 0.92,
+    opacity: 0.5,
     showTrueColor: false,
     showFlow: initialLayer.id === 'wind',
     leftOpen: true,

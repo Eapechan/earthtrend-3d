@@ -12,6 +12,7 @@ import { placeForPoint } from '../../data/locations'
 import { useIsMobile, useReducedMotion } from '../../hooks/useMotion'
 import type { Place, WindField } from '../../types'
 import WindOverlay from './WindOverlay'
+import GeoLabels from './GeoLabels'
 
 type CesiumApi = typeof import('cesium')
 
@@ -50,9 +51,9 @@ function createBaseLayer(Cesium: CesiumApi, date: string, trueColor: boolean): I
 
   const layer = new Cesium.ImageryLayer(provider)
   layer.alpha = trueColor ? 0.95 : 1
-  layer.brightness = trueColor ? 1.02 : 0.96
-  layer.contrast = 1.04
-  layer.saturation = trueColor ? 0.98 : 1
+  layer.brightness = trueColor ? 1.02 : 1.04
+  layer.contrast = trueColor ? 1.08 : 1.12
+  layer.saturation = trueColor ? 0.98 : 0.96
   return layer
 }
 
@@ -72,8 +73,10 @@ function createDataLayer(
   })
   const layer = new Cesium.ImageryLayer(provider)
   layer.alpha = alpha
-  layer.brightness = 1.03
-  layer.contrast = 1.05
+  // Improved visualization: better contrast for readability while preserving satellite detail
+  layer.brightness = 1.02
+  layer.contrast = 1.08
+  layer.saturation = 1.0
   return layer
 }
 
@@ -188,6 +191,13 @@ export default function GlobeView({ windField, windLoading, windError, onReady, 
         scene.postProcessStages.fxaa.enabled = !isMobile
         viewer.resolutionScale = isMobile ? 0.85 : 1
 
+        // Export viewer and Cesium to window for GeoLabels component
+        ;(window as any).earthtrendViewer = { current: viewer }
+        ;(window as any).Cesium = Cesium
+
+        // Fire event to notify GeoLabels that viewer is ready
+        window.dispatchEvent(new CustomEvent('globe-ready'))
+
         // Blue Marble / true colour base.
         const base = createBaseLayer(Cesium, state.date, state.showTrueColor)
         viewer.imageryLayers.add(base, 0)
@@ -269,6 +279,9 @@ export default function GlobeView({ windField, windLoading, windError, onReady, 
       activeRef.current = null
       compareRef.current = null
       markerRef.current = null
+      // Clean up window globals
+      delete (window as any).earthtrendViewer
+      delete (window as any).Cesium
     }
     // The viewer is created once; subsequent updates are handled below.
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -406,6 +419,8 @@ export default function GlobeView({ windField, windLoading, windError, onReady, 
         aria-label="Interactive 3D Earth globe showing NASA satellite imagery"
       />
 
+      <GeoLabels />
+
       <WindOverlay
         viewer={viewerRef.current}
         cesium={cesiumRef.current}
@@ -428,7 +443,7 @@ export default function GlobeView({ windField, windLoading, windError, onReady, 
             aria-orientation="vertical"
             aria-label="Drag to compare two dates"
           >
-            <div className="absolute top-1/2 left-1/2 flex h-9 w-9 -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-full border border-sky-300/60 bg-[#071523]/90 text-[10px] text-sky-200 shadow-lg">
+            <div className="absolute top-1/2 left-1/2 flex h-9 w-9 -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-full border border-sky-300/60 bg-[#071522]/90 text-[10px] text-sky-200 shadow-lg">
               ⇄
             </div>
           </div>
