@@ -52,7 +52,7 @@ export default function Header({ onOpenAbout }: { onOpenAbout: () => void }) {
             <Info size={16} />
           </button>
           <a
-            href="https://github.com/"
+            href="https://github.com/Eapechan/earthtrend-3d"
             target="_blank"
             rel="noreferrer noopener"
             className="icon-btn hidden sm:inline-flex"
