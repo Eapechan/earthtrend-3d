@@ -15,6 +15,13 @@ No API keys, no paid services, no backend.
 
 ![EarthTrend 3D at global scale](docs/screenshots/desktop-global.png)
 
+## Live site
+
+**[earthtrend-3d.netlify.app](https://earthtrend-3d.netlify.app)** — deployed from `main` by
+Netlify. The deployment was verified in a headless browser: the globe and Cesium runtime
+load, self-hosted `/geo` payloads return 200, searching a second-level name drills down to
+`Globe › India › Kerala › Alappuzha`, and there are no console or page errors.
+
 ## What it does
 
 - **Seven NASA GIBS products** across temperature, rainfall, vegetation, and atmosphere,

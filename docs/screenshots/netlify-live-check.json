@@ -1,0 +1,27 @@
+{
+  "consoleErrors": [],
+  "pageErrors": [],
+  "badResponses": [],
+  "steps": [
+    {
+      "step": "canvas",
+      "canvas": {
+        "width": 1440,
+        "height": 900
+      }
+    },
+    {
+      "step": "search-district-live",
+      "list": "Alappuzha\nKerala, India · District · level 2\nChengannur\nAlappuzha, Kerala · Town",
+      "crumb": "Globe\nIndia\nKerala\nAlappuzha\nReset",
+      "heading": [
+        "Alappuzha"
+      ]
+    }
+  ],
+  "final": {
+    "consoleErrorCount": 0,
+    "pageErrorCount": 0,
+    "badResponseCount": 0
+  }
+}
