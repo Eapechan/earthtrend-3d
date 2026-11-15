@@ -1,0 +1,78 @@
+{
+  "consoleErrors": [],
+  "pageErrors": [],
+  "badResponses": [],
+  "geoRequests": [
+    "200 src/services/geo/selection.ts",
+    "200 src/services/geo/index.ts",
+    "200 geo/index.json",
+    "200 geo/countries.json",
+    "200 geo/search-index.json",
+    "200 geo/admin1/USA.json",
+    "200 geo/admin2/USA.json",
+    "200 geo/admin1/IND.json",
+    "200 geo/admin2/IND.json"
+  ],
+  "steps": [
+    {
+      "step": "globe-canvas",
+      "canvasInfo": {
+        "width": 1440,
+        "height": 900
+      }
+    },
+    {
+      "step": "search-california",
+      "list": "California\nUnited States of America · Admin-1 · level 1\nBaja California\nMexico · Admin-1 · level 1\nBaja California Sur\nMexico · Admin-1 · level 1",
+      "crumb": "Globe\nUnited States of America\nCalifornia\nReset"
+    },
+    {
+      "step": "search-alappuzha",
+      "list": "Alappuzha\nKerala, India · District · level 2\nChengannur\nAlappuzha, Kerala · Town",
+      "crumb": "Globe\nIndia\nKerala\nAlappuzha\nReset"
+    },
+    {
+      "step": "alappuzha-heading",
+      "headings": [
+        "Alappuzha"
+      ]
+    },
+    {
+      "step": "breadcrumb-parent",
+      "crumb": "Globe\nIndia\nKerala\nReset"
+    },
+    {
+      "step": "layer-switch-wind",
+      "ok": true
+    },
+    {
+      "step": "compare-toggle",
+      "checked": true
+    },
+    {
+      "step": "click-centre",
+      "crumb": "Globe\nIndia\nKerala\nThrissur\nReset"
+    },
+    {
+      "step": "search-chengannur",
+      "headings": [
+        "Chengannur"
+      ]
+    },
+    {
+      "step": "mobile-kerala",
+      "crumb": "Globe\nIndia\nKerala\nReset"
+    },
+    {
+      "step": "reduced-motion",
+      "ok": true
+    }
+  ],
+  "badByHost": {},
+  "final": {
+    "consoleErrorCount": 0,
+    "pageErrorCount": 0,
+    "badResponseCount": 0,
+    "geoRequestCount": 9
+  }
+}

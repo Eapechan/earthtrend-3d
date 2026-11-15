@@ -7,6 +7,7 @@ import LayerRail from './components/LayerRail'
 import LocationPanel from './components/LocationPanel'
 import Timeline from './components/Timeline'
 import AboutModal from './components/AboutModal'
+import Breadcrumb from './components/Breadcrumb'
 import LoadingScreen from './components/LoadingScreen'
 import { useWindField } from './hooks/useWindField'
 import { useIsMobile } from './hooks/useMotion'
@@ -44,6 +45,8 @@ function Shell() {
       />
 
       <Header onOpenAbout={() => dispatch({ type: 'setAbout', open: true })} />
+
+      <Breadcrumb />
 
       {state.mobilePane && (
         <button

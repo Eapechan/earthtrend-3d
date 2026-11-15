@@ -5,15 +5,24 @@ point data**, and **honest statistics** in one interactive globe. Click anywhere
 see what the selected satellite product can actually resolve there, the latest available
 values for that grid cell, and a Mann–Kendall/Sen's-slope trend with confidence intervals.
 
+The same globe carries a **real administrative geography** — every country, its first-level
+states/provinces, and second-level districts/counties where open boundary data exists — so
+you can search, click, and navigate from the whole planet down to a district without ever
+being shown an invented border.
+
 Built with React 19, TypeScript, Vite, CesiumJS 1.147, Tailwind CSS 4, and Recharts.
 No API keys, no paid services, no backend.
 
-![EarthTrend 3D with the real 10 m wind vector layer](docs/desktop-wind.png)
+![EarthTrend 3D at global scale](docs/screenshots/desktop-global.png)
 
 ## What it does
 
 - **Seven NASA GIBS products** across temperature, rainfall, vegetation, and atmosphere,
   streamed as live WMTS tiles for the selected date.
+- **Global administrative drill-down**: country → state/province → district/county, with the
+  local administrative term shown (State, Province, County, Municipality, LGA, …).
+- **Global search** across every country and first-level division name plus 16,680
+  second-level names, merged with a curated set of cities and towns.
 - **True-colour MODIS Terra** and a static Blue Marble base map, with optional two-date
   swipe comparison.
 - **Point analysis** on click or place search: nearest available POWER day, four reanalysis
@@ -25,7 +34,32 @@ No API keys, no paid services, no backend.
   recent dates, ERA5 archive for older dates), rendered as a particle field or as static
   arrows when the user prefers reduced motion.
 
-![Chengannur point analysis](docs/desktop-chengannur.png)
+## Administrative geography
+
+Boundaries are a **reference layer**, separate from the environmental raster and point data.
+They are rebuilt at build time by `npm run geo`, self-hosted under `/geo/`, and never
+committed to git.
+
+| Level | Source | Coverage | Licence |
+| --- | --- | --- | --- |
+| Country (ADM0) | Natural Earth 1:50m | 235 countries | Public domain |
+| State / province (ADM1) | Natural Earth 1:10m | 249 countries, 4,596 features | Public domain |
+| District / county (ADM2) | geoBoundaries `gbOpen` | 20 curated countries, 16,680 units | ODbL 1.0 / CC BY 4.0 per country |
+
+The 20 second-level countries are **IND, USA, CAN, AUS, BRA, DEU, FRA, GBR, KEN, JPN, MEX,
+ZAF, IDN, ESP, ITA, NGA, TUR, ARG, PHL, VNM**. Everywhere else the panel says second-level
+data is unavailable; no boundary is synthesised to fill the gap. Each second-level unit is
+attributed to its parent state/province by a point-in-polygon test against the level-1
+geometry, so breadcrumbs and district searches resolve the real hierarchy.
+
+Progressive loading follows camera altitude: country outlines at global scale, first-level
+boundaries below ~8,000 km, second-level below ~1,500 km, and local labels below ~300 km.
+Simplified geometry, memoised network requests, and altitude hysteresis keep the scene light.
+Labels are drawn in an HTML overlay with greedy screen-space collision avoidance, and are
+excluded from the areas covered by the header, side panels, breadcrumb, and timeline. Labels
+belong to locations only — they are never produced by, or tied to, an environmental layer.
+
+![Alappuzha district, reached by searching a second-level name](docs/screenshots/desktop-district-search.png)
 
 ## Data and provenance
 
@@ -52,7 +86,7 @@ Sources:
 - **Natural Earth / NASA Blue Marble** — base imagery via GIBS.
 
 Every layer carries a per-product **publication lag** so the date bounds match what GIBS
-actually has. AIRS lags ~6 days, MODIS/IMERG ~2 days, NDVI ~20 days, MERRA-2 monthly
+actually has. AIRS lags ~8 days, MODIS/IMERG ~2 days, NDVI ~20 days, MERRA-2 monthly
 ~100 days. The app never relabels an older available day as "today".
 
 ## Honest resolution, not fake precision
@@ -73,6 +107,8 @@ is never presented as extra detail.
 GIBS raster pixels are **not** sampled for point values. Values come from NASA POWER's
 reanalysis grid, and the panel labels the nearest available POWER day. Vegetation, aerosol,
 and CO₂ layers state that POWER publishes no matching point series.
+
+![Chengannur point analysis](docs/screenshots/desktop-chengannur.png)
 
 ## Trend methodology
 
@@ -121,14 +157,19 @@ Requirements: Node.js 22+ and npm.
 npm install
 npm run dev        # copies the Cesium runtime, then starts Vite
 npm run typecheck
-npm test           # 24 unit tests for trends, dates, and resolution logic
-npm run build      # copies Cesium, type-checks, builds, and checks dist sizes
+npm test           # 45 unit tests for geography, trends, dates, and resolution logic
+npm run geo        # rebuild self-hosted boundaries under public/geo (cached downloads)
+npm run verify:geo # 48 checks on global coverage, native terms, parents, payload sizes
+npm run build      # copies Cesium, rebuilds boundaries, type-checks, builds, checks sizes
 npm run preview    # serves dist on http://localhost:4173
 ```
 
 The build copies Cesium's prebuilt IIFE runtime into `public/cesium` and loads it lazily at
 runtime with `CESIUM_BASE_URL=/cesium/`. Cesium is not bundled by Vite, and no ion token is
-used.
+used. Boundary payloads are generated into `public/geo` (gitignored) and self-hosted, so the
+deployed site downloads no third-party boundary tiles. Every boundary download is non-fatal:
+an offline build keeps the previous payloads, and a country with no second-level data simply
+has that level reported as unavailable.
 
 ## Deploy to Netlify
 
@@ -139,8 +180,9 @@ The repository includes `netlify.toml`, so no dashboard configuration is require
 - Node version: 22
 - Environment variables: none
 
-`netlify.toml` also adds the SPA fallback (`/* → /index.html`, status 200) and immutable
-cache headers for `/cesium/*` and `/assets/*`.
+`netlify.toml` also adds the SPA fallback (`/* → /index.html`, status 200), immutable
+cache headers for `/cesium/*` and `/assets/*`, and a one-day cache for the rebuilt
+`/geo/*` payloads.
 
 To deploy from GitHub: **Netlify → Add new site → Import an existing project → GitHub →
 choose this repository → Deploy**. The checked-in config supplies the rest.
@@ -156,8 +198,15 @@ choose this repository → Deploy**. The checked-in config supplies the rest.
 
 ## Known limitations
 
+- Second-level boundaries exist only for the 20 curated countries listed above. Other
+  countries still drill down to real first-level divisions; their second level is reported
+  as unavailable rather than approximated.
+- Simplified boundary geometry is a cartographic reference, not a survey. Very small islands
+  and enclaves may be omitted at the coarsest zoom, and boundaries near the antimeridian are
+  stored as world-spanning boxes for hit-testing.
 - Native grids are 1° (AIRS), ~0.1° (IMERG), ~0.5° (MERRA-2), or 1–10 km (MODIS). None of
-  these is a neighbourhood measurement.
+  these is a neighbourhood measurement — an administrative boundary never increases the
+  measurement resolution of the underlying dataset.
 - AIRS has no retrieval under thick cloud; MODIS has gaps at bright surfaces and high
   latitudes; Web-Mercator tiles distort polar regions.
 - Monthly means suppress storms and gusts. Trends describe a grid cell, not a causal

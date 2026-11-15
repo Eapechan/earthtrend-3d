@@ -1,6 +1,6 @@
 import type { Place } from '../types'
 
-const globe: Place = {
+export const GLOBE_PLACE: Place = {
   id: 'global',
   name: 'Global',
   region: 'Earth',
@@ -14,7 +14,7 @@ const globe: Place = {
 }
 
 export const PLACES: Place[] = [
-  globe,
+  GLOBE_PLACE,
   // Continents
   { id: 'asia', name: 'Asia', kind: 'continent', lat: 34, lon: 90, bbox: [26, -11, 150, 82], level: 2, footprintKm: 8500, blurb: 'Monsoon systems, Himalayan ice and dense population centres.' },
   { id: 'africa', name: 'Africa', kind: 'continent', lat: 2, lon: 20, bbox: [-18, -35, 52, 38], level: 2, footprintKm: 8000, blurb: 'Sahel rainfall, savanna phenology and Saharan dust.' },

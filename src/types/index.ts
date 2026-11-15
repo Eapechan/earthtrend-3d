@@ -6,6 +6,22 @@ export type PowerVariableId = 'T2M' | 'PRECTOTCORR' | 'WS2M' | 'RH2M'
 
 export type LocationKind = 'global' | 'continent' | 'country' | 'state' | 'district' | 'city' | 'town' | 'point'
 
+export interface PlaceHierarchyItem {
+  id: string
+  name: string
+  kind: LocationKind
+  lat?: number
+  lon?: number
+  bbox?: [number, number, number, number]
+  footprintKm?: number
+  adminLevel?: 0 | 1 | 2 | 3
+  iso2?: string
+  iso3?: string
+  geoType?: string
+  boundarySource?: string
+  boundaryLicense?: string
+}
+
 export interface Place {
   id: string
   name: string
@@ -19,6 +35,19 @@ export interface Place {
   /** Approximate width of the area of interest in km, used for resolution honesty checks. */
   footprintKm: number
   blurb?: string
+  /** ISO 3166-1 alpha-2 / alpha-3 for the containing country. */
+  iso2?: string
+  iso3?: string
+  /** 0 = country, 1 = first-level, 2 = second-level, 3 = local point. */
+  adminLevel?: 0 | 1 | 2 | 3
+  /** Stable id of the boundary feature this place came from. */
+  geoId?: string
+  /** Native term for the boundary, e.g. "State", "Province", "District". */
+  geoType?: string
+  boundarySource?: string
+  boundaryLicense?: string
+  /** Ancestors, outermost first, ending with this place itself. */
+  hierarchy?: PlaceHierarchyItem[]
 }
 
 export interface GibsVariant {

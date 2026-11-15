@@ -9,6 +9,11 @@ node_modules
 # Cesium runtime copied from node_modules by scripts/copy-cesium.mjs
 public/cesium
 
+# Administrative boundary payloads built by scripts/fetch-geo.mjs.
+# They are downloaded/cached locally and rebuilt on deploy, not committed.
+public/geo
+.geocache
+
 # Editor / OS
 .vscode/*
 !.vscode/extensions.json

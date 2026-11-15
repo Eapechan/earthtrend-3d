@@ -101,7 +101,10 @@ export default function Timeline() {
   }
 
   return (
-    <div className="pointer-events-none absolute inset-x-0 bottom-[56px] z-30 px-3 pb-3 sm:px-4 sm:pb-4 lg:bottom-0 lg:px-4 lg:pb-4">
+    <div
+      data-overlay="timeline"
+      className="pointer-events-none absolute inset-x-0 bottom-[56px] z-30 px-3 pb-3 sm:px-4 sm:pb-4 lg:bottom-0 lg:px-4 lg:pb-4"
+    >
       <div className="pointer-events-auto glass mx-auto max-w-[860px] rounded-2xl px-3 py-2.5 sm:px-4">
         <div className="flex flex-wrap items-center gap-x-3 gap-y-1.5">
           <div className="flex min-w-0 items-center gap-2">

@@ -1,15 +1,17 @@
-import { useMemo, useState, type ReactNode } from 'react'
+import { Fragment, useEffect, useMemo, useState, type ReactNode } from 'react'
 import { createPortal } from 'react-dom'
 import {
   AlertTriangle,
   ArrowDownRight,
   ArrowUpRight,
   BarChart3,
+  ChevronRight,
   Clock,
   Database,
   Droplets,
   ExternalLink,
   Gauge,
+  Globe2,
   Minus,
   Ruler,
   Thermometer,
@@ -20,6 +22,8 @@ import { useApp } from '../state/AppContext'
 import { usePowerBundle } from '../hooks/usePower'
 import { usePowerDaily } from '../hooks/usePowerDaily'
 import { nearestDailyValue } from '../services/nasa/power'
+import { loadGeoIndex } from '../services/geo'
+import type { GeoIndex } from '../services/geo/types'
 import { POWER_VARIABLES, SEASON_LABELS } from '../data/power'
 import { PROVENANCE } from '../data/provenance'
 import { assessResolution, pointCellNote } from '../utils/resolution'
@@ -66,6 +70,27 @@ export default function LocationPanel() {
   const place = state.place
   const [season, setSeason] = useState<Season>('annual')
   const [expanded, setExpanded] = useState(false)
+  const [geoIndex, setGeoIndex] = useState<GeoIndex | null>(null)
+
+  useEffect(() => {
+    let cancelled = false
+    loadGeoIndex()
+      .then((index) => {
+        if (!cancelled) setGeoIndex(index)
+      })
+      .catch(() => {
+        /* the panel simply omits coverage numbers */
+      })
+    return () => {
+      cancelled = true
+    }
+  }, [])
+
+  const countryEntry = place.iso3
+    ? geoIndex?.countries.find((country) => country.iso3 === place.iso3) ?? null
+    : null
+  const hasLevel2 = place.iso3 ? geoIndex?.admin2.some((entry) => entry.iso3 === place.iso3) ?? false : false
+  const hierarchy = place.hierarchy ?? []
 
   const assessment = useMemo(
     () => assessResolution(place, variant.nativeResolutionKm, variant.maxLevel),
@@ -129,6 +154,79 @@ export default function LocationPanel() {
 
       <div className="scroll-thin min-h-0 flex-1 overflow-y-auto px-3.5 pb-5">
         {place.blurb && <p className="text-[11px] leading-relaxed text-muted">{place.blurb}</p>}
+
+        {/* ---- Administrative geography ----------------------------------- */}
+        <section className="mt-3 rounded-xl border border-white/10 bg-white/[0.03] p-3">
+          <div className="flex items-center justify-between gap-2">
+            <span className="label-caps flex items-center gap-1.5 text-sky-200/80">
+              <Globe2 size={11} /> Administrative geography
+            </span>
+            <span className="chip">{place.geoType ?? (place.kind === 'country' ? 'Country' : place.kind)}</span>
+          </div>
+
+          {hierarchy.length > 0 ? (
+            <div className="mt-2 flex flex-wrap items-center gap-1">
+              {hierarchy.map((item, index) => (
+                <Fragment key={`${item.kind}:${item.id}`}>
+                  {index > 0 && <ChevronRight size={9} className="text-faint/70" aria-hidden="true" />}
+                  <span
+                    className={`rounded-full border px-1.5 py-[1px] text-[9.5px] ${
+                      index === hierarchy.length - 1
+                        ? 'border-sky-300/40 bg-sky-400/10 text-sky-100'
+                        : 'border-white/10 bg-white/[0.03] text-muted'
+                    }`}
+                  >
+                    {item.name}
+                  </span>
+                </Fragment>
+              ))}
+            </div>
+          ) : (
+            <p className="mt-2 text-[10px] text-faint">
+              {place.kind === 'point'
+                ? 'Free map point — no administrative boundary is attached to this location.'
+                : 'This curated place is not tied to a boundary feature. Click the globe or search an administrative name to load its boundary and full hierarchy.'}
+            </p>
+          )}
+
+          <dl className="mt-2 grid grid-cols-2 gap-x-3 gap-y-1 text-[9.5px]">
+            <dt className="text-faint">Boundary source</dt>
+            <dd className="truncate text-right text-muted" title={place.boundarySource ?? undefined}>
+              {place.boundarySource ?? '—'}
+            </dd>
+            <dt className="text-faint">Licence</dt>
+            <dd className="truncate text-right text-muted" title={place.boundaryLicense ?? undefined}>
+              {place.boundaryLicense ?? '—'}
+            </dd>
+            <dt className="text-faint">Level</dt>
+            <dd className="text-right text-muted">
+              {place.adminLevel === 0
+                ? 'Country (ADM0)'
+                : place.adminLevel === 1
+                  ? 'First-level (ADM1)'
+                  : place.adminLevel === 2
+                    ? 'Second-level (ADM2)'
+                    : place.adminLevel === 3
+                      ? 'Local'
+                      : '—'}
+            </dd>
+            <dt className="text-faint">Coverage</dt>
+            <dd className="text-right text-muted">
+              {!place.iso3
+                ? 'Point only'
+                : countryEntry
+                  ? `${countryEntry.level1} first-level${hasLevel2 ? ' · second-level included' : ' · no second-level data'}`
+                  : geoIndex
+                    ? 'No matched country'
+                    : 'Loading…'}
+            </dd>
+          </dl>
+
+          <p className="mt-2 text-[10px] leading-relaxed text-sky-100/60">
+            Boundaries are geographic reference layers. Zooming in adds administrative detail; it never
+            increases the measurement resolution of the NASA dataset.
+          </p>
+        </section>
 
         {/* ---- Resolution honesty ------------------------------------------ */}
         <section className="mt-3 rounded-xl border border-sky-400/20 bg-sky-400/[0.05] p-3">

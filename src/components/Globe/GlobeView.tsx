@@ -9,10 +9,11 @@ import {
   gibsDateForVariant,
 } from '../../services/nasa/gibs'
 import { placeForPoint } from '../../data/locations'
+import { resolveGeoSelection } from '../../services/geo/selection'
 import { useIsMobile, useReducedMotion } from '../../hooks/useMotion'
 import type { Place, WindField } from '../../types'
 import WindOverlay from './WindOverlay'
-import GeoLabels from './GeoLabels'
+import GlobeGeography from './GlobeGeography'
 
 type CesiumApi = typeof import('cesium')
 
@@ -26,6 +27,14 @@ interface GlobeViewProps {
 
 function staticTileUrl(layerId: string, tms: string, extension: string): string {
   return `${GIBS_WMTS_BASE}/${layerId}/default/${tms}/{z}/{y}/{x}.${extension}`
+}
+
+/**
+ * Administrative names are rendered by GlobeGeography's HTML overlay, so the
+ * Cesium entity label is reserved for point-like places to avoid duplicates.
+ */
+function showsMarkerLabel(kind: Place['kind']): boolean {
+  return kind === 'point' || kind === 'city' || kind === 'town'
 }
 
 function createBaseLayer(Cesium: CesiumApi, date: string, trueColor: boolean): ImageryLayer {
@@ -191,13 +200,6 @@ export default function GlobeView({ windField, windLoading, windError, onReady, 
         scene.postProcessStages.fxaa.enabled = !isMobile
         viewer.resolutionScale = isMobile ? 0.85 : 1
 
-        // Export viewer and Cesium to window for GeoLabels component
-        ;(window as any).earthtrendViewer = { current: viewer }
-        ;(window as any).Cesium = Cesium
-
-        // Fire event to notify GeoLabels that viewer is ready
-        window.dispatchEvent(new CustomEvent('globe-ready'))
-
         // Blue Marble / true colour base.
         const base = createBaseLayer(Cesium, state.date, state.showTrueColor)
         viewer.imageryLayers.add(base, 0)
@@ -226,6 +228,7 @@ export default function GlobeView({ windField, windLoading, windError, onReady, 
           },
           label: {
             text: state.place.name,
+            show: showsMarkerLabel(state.place.kind),
             font: '600 12px Inter, system-ui, sans-serif',
             fillColor: Cesium.Color.fromCssColorString('#e6edf7'),
             showBackground: true,
@@ -246,10 +249,11 @@ export default function GlobeView({ windField, windLoading, windError, onReady, 
           const cartesian = viewer?.camera.pickEllipsoid(movement.position, scene.globe.ellipsoid)
           if (!cartesian) return
           const cartographic = Cesium.Cartographic.fromCartesian(cartesian)
-          const place = placeForPoint(
-            Cesium.Math.toDegrees(cartographic.latitude),
-            Cesium.Math.toDegrees(cartographic.longitude),
-          )
+          const lon = Cesium.Math.toDegrees(cartographic.longitude)
+          const lat = Cesium.Math.toDegrees(cartographic.latitude)
+          // Administrative hit-testing first (country → state → district),
+          // then the curated dataset of named places, then a free map point.
+          const place = resolveGeoSelection(lon, lat) ?? placeForPoint(lat, lon)
           dispatch({ type: 'setPlace', place })
         }, Cesium.ScreenSpaceEventType.LEFT_CLICK)
         clickHandlerRef.current = handler
@@ -279,9 +283,6 @@ export default function GlobeView({ windField, windLoading, windError, onReady, 
       activeRef.current = null
       compareRef.current = null
       markerRef.current = null
-      // Clean up window globals
-      delete (window as any).earthtrendViewer
-      delete (window as any).Cesium
     }
     // The viewer is created once; subsequent updates are handled below.
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -370,7 +371,12 @@ export default function GlobeView({ windField, windLoading, windError, onReady, 
       marker.position = new Cesium.ConstantPositionProperty(
         Cesium.Cartesian3.fromDegrees(state.place.lon, state.place.lat, 0),
       )
-      if (marker.label) marker.label.text = new Cesium.ConstantProperty(state.place.name)
+      if (marker.label) {
+        marker.label.text = new Cesium.ConstantProperty(state.place.name)
+        // Administrative names are drawn by the HTML label overlay; only
+        // point-like places keep a Cesium label to avoid duplicate text.
+        marker.label.show = new Cesium.ConstantProperty(showsMarkerLabel(state.place.kind))
+      }
     }
     // Keep the opening wide shot: do not dive into the default place on load.
     if (firstPlaceRef.current) {
@@ -419,7 +425,7 @@ export default function GlobeView({ windField, windLoading, windError, onReady, 
         aria-label="Interactive 3D Earth globe showing NASA satellite imagery"
       />
 
-      <GeoLabels />
+      <GlobeGeography viewer={ready ? viewerRef.current : null} cesium={ready ? cesiumRef.current : null} />
 
       <WindOverlay
         viewer={viewerRef.current}

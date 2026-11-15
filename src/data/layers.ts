@@ -27,7 +27,9 @@ export const LAYERS: LayerDefinition[] = [
         maxLevel: 6,
         cadence: 'daily',
         startDate: '2002-09-01',
-        lagDays: 6,
+        // AIRS daily products publish with a roughly week-long lag; the newest
+        // date GIBS can reliably hold is about 8 days back.
+        lagDays: 8,
         units: '°C',
         quantityLabel: 'Surface air temperature',
         nativeResolution: '1° × 1° (~110 km)',
@@ -226,7 +228,8 @@ export const LAYERS: LayerDefinition[] = [
         maxLevel: 6,
         cadence: 'daily',
         startDate: '2002-09-01',
-        lagDays: 6,
+        // Matches the air-temperature product: about a week of publication lag.
+        lagDays: 8,
         units: '%',
         quantityLabel: 'Surface relative humidity',
         nativeResolution: '1° × 1° (~110 km)',

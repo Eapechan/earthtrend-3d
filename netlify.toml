@@ -24,6 +24,14 @@
   [headers.values]
     Cache-Control = "public, max-age=31536000, immutable"
 
+# Boundary payloads are rebuilt on deploy; a day of caching keeps repeat
+# visits fast without pinning a stale dataset for a week.
+[[headers]]
+  for = "/geo/*"
+  [headers.values]
+    Cache-Control = "public, max-age=86400"
+    Access-Control-Allow-Origin = "*"
+
 [[headers]]
   for = "/*"
   [headers.values]
