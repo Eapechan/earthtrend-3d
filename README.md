@@ -162,7 +162,7 @@ Requirements: Node.js 22+ and npm.
 
 ```bash
 npm install
-npm run dev        # copies the Cesium runtime, then starts Vite
+npm run dev        # copies the Cesium runtime, then starts Vite.
 npm run typecheck
 npm test           # 45 unit tests for geography, trends, dates, and resolution logic
 npm run geo        # rebuild self-hosted boundaries under public/geo (cached downloads)
